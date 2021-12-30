@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>文章统计</title>
+    <script src="https://cdn.staticfile.org/echarts/4.3.0/echarts.min.js"></script>
+<!--    <script src="js/echarts.min.js"></script>-->
+    <script src="js/worldcloud.js"></script>
+    <script src="js/jquery-1.11.0.js"></script>
+</head>
+<body>
+  <div id="main" style="width: 600px;height: 600px"></div>
+<script>
+    $(function () {
+        var name=new Array(0);
+        var num=new Array(0);
+        var url="Servlet?method=getTu";
+        $.ajax({
+            type: "post",
+            url: url,
+            data:[],
+            dataType: "json",
+            success: function(result){
+                for(var i=0;i<result.length;i++){
+                    name.push(result[i].name);
+                    num.push(result[i].num);
+                }
+                var chartDom = document.getElementById('main');
+                var myChart = echarts.init(chartDom);
+                var option = {
+                    title: {
+                        text: '各类文章总数'
+                    },
+                    xAxis: {
+                        type: 'category',
+                        data: name
+                    },
+                    yAxis: {
+                        type: 'value'
+                    },
+                    series: [
+                        {
+                            data: num,
+                            type: 'bar',
+                            showBackground: true,
+                            backgroundStyle: {
+                                color: 'rgba(180, 180, 180, 0.2)'
+                            }
+                        }
+                    ]
+                };
+                myChart.setOption(option);
+            },
+            error: function(){
+                alert("错误");
+            }
+        });
+    })
+</script>
+</body>
+</html>

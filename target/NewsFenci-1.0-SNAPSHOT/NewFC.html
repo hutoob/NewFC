@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>新闻分类</title>
+    <link rel="stylesheet" href="resource/layui/css/layui.css">
+    <script src="js/jquery-1.11.0.js"></script>
+    <script src="resource/layui/layui.js"></script>
+</head>
+<body>
+<div id="test1" class="demo-tree-more" style="float: left;width: 20%"></div>
+<div style="float: right;width: 80%">
+    <table class="layui-hide" id="new" lay-filter="new"></table>
+</div>
+
+<script>
+    $(function () {
+        layui.use('tree', function(){
+            var tree = layui.tree;
+            //渲染
+            var inst1 = tree.render({
+                elem: '#test1'//绑定元素
+                ,click: function(obj){
+                    if(obj.data.title!="新闻"){
+                        getNew(obj.data.id);
+                    }
+                }
+                ,data: [{
+                    title: '新闻' //一级菜单
+                    ,children: [{
+                        title: '财经(8597)', //二级菜单
+                        id:"财经",
+                    }, {title:'房产(200)',
+                        id:"房产",
+                    }, {title:'教育(200)',
+                        id:"教育",
+                    },{title:'军事(158)',
+                        id:"军事",
+                    },{title:'科技(830)',
+                        id:"科技",
+                    },{title:'汽车(647)',
+                        id:"汽车",
+                    },{title:'体育(1200)',
+                        id:"体育",
+                    },{title:'游戏(1300)',
+                        id:"游戏",
+                    },{title:'娱乐(1200)',
+                        id:"娱乐",
+                    }]
+                }]
+            });
+        });
+    });
+    function getData(title,name) {
+        var url="Servlet?method=getData&title="+title+"&fenlei="+name;
+        $.ajax({
+            type: "post",
+            url: url,
+            data:[],
+            dataType: "text",
+            success: function(result){
+                layer.alert(result);
+            },
+            error: function(){
+                alert("错误");
+            }
+        });
+    }
+    function getNew(f) {
+        alert("ok");
+        layui.use('table', function () {
+            var table = layui.table;
+            table.render({
+                elem: '#new'
+                , url: 'Servlet?method=getNew&f='+f
+                ,width:1100
+                , cellMinWidth: 200 //全局定义常规单元格的最小宽度，layui 2.2.1 新增
+                , cols: [[
+                    {field: 'id', width: 160, title: 'id'},
+                    {field: 'title', title: '新闻标题' ,align: 'center',event: 'getData'}
+                    , {field: 'channelName', width: 160, title: '类别',edit: 'text'}
+                ]]
+            });
+            layui.use('table', function(){
+                var table = layui.table;
+                //监听单元格事件
+                table.on('tool(new)', function(obj){
+                    var data = obj.data;
+                    if(obj.event === 'getData'){
+                        getData(data.title,data.channelName);
+                    }
+                });
+            });
+        });
+    };
+</script>
+</body>
+</html>

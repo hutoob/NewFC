@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="js/jquery-1.11.0.js"></script>
+    <script src="js/echarts.js"></script>
+    <script src="js/worldcloud.js"></script>
+</head>
+<body>
+<div id="main" style="width:100%;height:800px;"></div>
+</div>
+</body>
+<script type="text/javascript">
+    var myChart = echarts.init(document.getElementById('main'));
+    var statisticsData =[];
+    myChart.showLoading();
+    $.ajax({
+        type : "post",
+        async : true, //异步请求（同步请求将会锁住浏览器，其他操作须等请求完成才可执行）
+        url : "Servlet?method=gameTu", //请求发送到Servlet
+        data : {},
+        dataType : "json", //返回数据形式为json
+        //7.请求成功后接收数据name+num两组数据
+        success : function(result) {
+            //result为服务器返回的json对象
+            if (result) {
+                //8.取出数据存入数组
+                for (var i = 0; i <result.length; i++) {
+                    var statisticsObj = {name:'',value:''};   //因为ECharts里边需要的的数据格式是这样的
+                    statisticsObj.name =result[i].name;
+                    statisticsObj.value =result[i].num;
+                    //alert( statisticsObj.name);
+                    //alert(statisticsObj.value);
+                    statisticsData.push(statisticsObj);
+                }
+                //alert(statisticsData);
+                //把拿到的异步数据push进我自己建的数组里
+                myChart.hideLoading();
+                //9.覆盖操作-根据数据加载数据图表
+                var z1_option = {
+                    title: {
+                        text: '游戏新闻统计'
+                    },
+                    tooltip: {},
+                    series: [{
+                        type : 'wordCloud',  //类型为字符云
+                        shape:'smooth',  //平滑
+                        gridSize : 8, //网格尺寸
+                        size : ['50%','50%'],
+                        //sizeRange : [ 50, 100 ],
+                        rotationRange : [-45, 0, 45, 90], //旋转范围
+                        textStyle : {
+                            normal : {
+                                fontFamily:'微软雅黑',
+                                color: function() {
+                                    return 'rgb(' +
+                                        Math.round(Math.random() * 255) +
+                                        ', ' + Math.round(Math.random() * 255) +
+                                        ', ' + Math.round(Math.random() * 255) + ')'
+                                }
+                            },
+                            emphasis : {
+                                shadowBlur : 5,  //阴影距离
+                                shadowColor : '#333'  //阴影颜色
+                            }
+                        },
+                        left: 'center',
+                        top: 'center',
+                        right: null,
+                        bottom: null,
+                        width:'100%',
+                        height:'100%',
+                        data:statisticsData
+                    }]
+                };
+                myChart.setOption(z1_option, true);
+            }
+        },
+    })
+</script>
+</html>
